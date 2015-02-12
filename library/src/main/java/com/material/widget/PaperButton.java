@@ -1,5 +1,6 @@
 package com.material.widget;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.content.res.TypedArray;
@@ -20,7 +21,7 @@ import android.view.View;
 public class PaperButton extends View {
 
     private static final String TAG = PaperButton.class.getSimpleName();
-    private static final long ANIMATION_DURATION = 200;
+    private static final long ANIMATION_DURATION = 400;
     private static final int StateNormal = 1;
     private static final int StateTouchDown = 2;
     private static final int StateTouchUp = 3;
@@ -80,6 +81,10 @@ public class PaperButton extends View {
             AssetManager assets = context.getAssets();
             Typeface typeface = Typeface.createFromAsset(assets, assetPath);
             textPaint.setTypeface(typeface);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        	textPaint.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+        } else {
+        	textPaint.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
         }
         mShadowRadius = attributes.getFloat(R.styleable.PaperButton_paper_shadow_radius, SHADOW_RADIUS);
         mShadowOffsetX = attributes.getFloat(R.styleable.PaperButton_paper_shadow_offset_x, SHADOW_OFFSET_X);
@@ -193,7 +198,7 @@ public class PaperButton extends View {
         return true;
     }
 
-    @Override
+    @SuppressLint("DefaultLocale") @Override
     protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
         int radius = 0;
@@ -206,14 +211,14 @@ public class PaperButton extends View {
             case StateTouchDown:
                 ripplePaint.setAlpha(255);
                 if (elapsed < ANIMATION_DURATION) {
-                    radius = Math.round(elapsed * getWidth() / 2 / ANIMATION_DURATION);
+                    radius = Math.round(elapsed * getWidth() / ANIMATION_DURATION);
                     float shadowAlpha = (MAX_SHADOW_COLOR_ALPHA - MIN_SHADOW_COLOR_ALPHA)
                             * elapsed
                             / ANIMATION_DURATION
                             + MIN_SHADOW_COLOR_ALPHA;
                     shadowColor = changeColorAlpha(mShadowColor, shadowAlpha);
                 } else {
-                    radius = getWidth() / 2;
+                    radius = getWidth();
                     shadowColor = changeColorAlpha(mShadowColor, MAX_SHADOW_COLOR_ALPHA);
                 }
                 postInvalidate();
@@ -222,7 +227,7 @@ public class PaperButton extends View {
                 if (elapsed < ANIMATION_DURATION) {
                     int alpha = Math.round((ANIMATION_DURATION - elapsed) * 255 / ANIMATION_DURATION);
                     ripplePaint.setAlpha(alpha);
-                    radius = getWidth() / 2 + Math.round(elapsed * getWidth() / 2 / ANIMATION_DURATION);
+                    radius = getWidth() + Math.round(elapsed * getWidth() / 2 / ANIMATION_DURATION);
                     float shadowAlpha = (MAX_SHADOW_COLOR_ALPHA - MIN_SHADOW_COLOR_ALPHA)
                             * (ANIMATION_DURATION - elapsed)
                             / ANIMATION_DURATION
@@ -251,7 +256,7 @@ public class PaperButton extends View {
         canvas.restore();
         if (mText != null && mText.length() > 0) {
             int y = (int) (getHeight() / 2 - ((textPaint.descent() + textPaint.ascent()) / 2));
-            canvas.drawText(mText.toString(), getWidth() / 2, y, textPaint);
+            canvas.drawText(mText.toString().toUpperCase(), getWidth() / 2, y, textPaint);
         }
     }
 }
