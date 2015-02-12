@@ -1,4 +1,6 @@
 .gradle
 /local.properties
 /.idea/workspace.xml
+bin/
+gen/
 .DS_Store
